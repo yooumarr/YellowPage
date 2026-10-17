@@ -85,6 +85,19 @@ def safe_next(target: str | None) -> str:
     return url_for("index")
 
 
+def reauthenticate():
+    """Guard the account forms: the current password must be supplied.
+
+    Returns a response when the password is wrong, so callers can simply
+    ``return reauthenticate()``. Changing details behind a borrowed session
+    would otherwise be a way to lock somebody out of their own account.
+    """
+    if auth.verify_password(g.user["id"], request.form.get("current_password", "")):
+        return None
+    flash("That is not your current password.", "error")
+    return render_template("account.html"), 400
+
+
 def load_note_or_404(note_id: int) -> dict:
     try:
         return notes.read_note(note_id)
@@ -152,6 +165,46 @@ def logout():
     session.clear()
     flash("You have been logged out.", "success")
     return redirect(url_for("index"))
+
+
+@app.get("/account")
+@login_required
+def account_form():
+    return render_template("account.html")
+
+
+@app.post("/account/username")
+@login_required
+def change_username():
+    wrong = reauthenticate()
+    if wrong is not None:
+        return wrong
+
+    try:
+        user = auth.change_username(g.user["id"], request.form.get("username", ""))
+    except ValueError as exc:
+        flash(str(exc), "error")
+        return render_template("account.html"), 400
+
+    flash(f"Your username is now {user['username']}.", "success")
+    return redirect(url_for("account_form"))
+
+
+@app.post("/account/password")
+@login_required
+def change_password():
+    wrong = reauthenticate()
+    if wrong is not None:
+        return wrong
+
+    try:
+        auth.change_password(g.user["id"], request.form.get("new_password", ""))
+    except ValueError as exc:
+        flash(str(exc), "error")
+        return render_template("account.html"), 400
+
+    flash("Your password has been changed.", "success")
+    return redirect(url_for("account_form"))
 
 
 # ------------------------------------------------------------------- notes ---

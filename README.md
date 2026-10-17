@@ -73,6 +73,11 @@ Then open <http://127.0.0.1:5000>. Register a couple of accounts, create a note
 with each, and you will see one user's note in the other's list — readable, but
 without Edit/Delete buttons.
 
+Clicking your avatar in the header opens **Your account**, where you can change
+your own username or password. Both take your current password as confirmation.
+Renaming needs no follow-up: notes resolve their owner through a join, so every
+note you own shows the new name straight away.
+
 ### MCP server
 
 `opencode.json` already registers it as `yellowpage` (and `.vscode/mcp.json` does

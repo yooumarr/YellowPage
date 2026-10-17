@@ -7,6 +7,22 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  {# Purely decorative notepads, defined once and stamped out with <use>. #}
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-notepad" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5" y="4.5" width="14" height="16" rx="2"></rect>
+      <path d="M9 2.5v3M15 2.5v3"></path>
+      <path d="M8.5 10h7M8.5 13.5h7M8.5 17h4"></path>
+    </symbol>
+  </svg>
+
+  <div class="decor" aria-hidden="true">
+    {% for _ in range(6) %}
+      <span><svg><use href="#icon-notepad"></use></svg></span>
+    {% endfor %}
+  </div>
+
   <header>
     <a class="brand" href="{{ url_for('index') }}">YellowPage</a>
     <nav>
@@ -17,7 +33,11 @@
           <form method="post" action="{{ url_for('logout') }}">
             <button type="submit" class="nav-link">Log out</button>
           </form>
-          {{ avatar(g.user.username) }}
+          <a class="account-link" href="{{ url_for('account_form') }}"
+             title="Account settings for {{ g.user.username }}"
+             aria-label="Account settings for {{ g.user.username }}">
+            {{ avatar(g.user.username, decorative=true) }}
+          </a>
         </div>
       {% else %}
         <a class="nav-link" href="{{ url_for('login_form') }}">Log in</a>

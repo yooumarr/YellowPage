@@ -4,16 +4,17 @@
 :root {
   color-scheme: light dark;
 
-  --bg: #ffffff;
+  --bg: #fdf6dd;
   --fg: #1b1f24;
   --muted: #6b7280;
-  --border: #e4e7eb;
-  --card: #fbfbfc;
-  --note-bg: #e3eefb;
-  --note-border: #c9dcf3;
+  --border: #ece2c2;
+  --card: #fffdf6;
+  --note-bg: #fbe3e3;
+  --note-border: #f0c6c6;
   --accent: #2563eb;
   --accent-fg: #ffffff;
   --danger: #dc2626;
+  --decor: #b8912b;
   --radius: 0.5rem;
   --shadow: 0 1px 2px rgb(0 0 0 / 6%);
 }
@@ -25,11 +26,12 @@
     --muted: #9aa4b2;
     --border: #272c34;
     --card: #151922;
-    --note-bg: #15202e;
-    --note-border: #24344a;
+    --note-bg: #2b1618;
+    --note-border: #4a2528;
     --accent: #5b93ff;
     --accent-fg: #0b1020;
     --danger: #f87171;
+    --decor: #6b5a2a;
     --shadow: none;
   }
 }
@@ -46,6 +48,109 @@ body {
   line-height: 1.55;
   color: var(--fg);
   background: var(--bg);
+}
+
+/* ------------------------------------------------------ decorative notepads */
+
+/* Defined once and reused with <use>, so the marks below stay tiny in markup. */
+.icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Scattered notepads sitting behind everything. They never take the pointer, so
+   they cannot swallow a click meant for a note or a link. */
+.decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--decor);
+}
+
+.decor span {
+  position: absolute;
+  display: block;
+}
+
+.decor svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.decor span:nth-child(1) {
+  top: 7%;
+  left: 2.5%;
+  width: 4.5rem;
+  height: 4.5rem;
+  transform: rotate(-14deg);
+  opacity: 0.34;
+}
+
+.decor span:nth-child(2) {
+  top: 21%;
+  right: 3%;
+  width: 3.4rem;
+  height: 3.4rem;
+  transform: rotate(12deg);
+  opacity: 0.24;
+}
+
+.decor span:nth-child(3) {
+  top: 43%;
+  left: 1.5%;
+  width: 3rem;
+  height: 3rem;
+  transform: rotate(9deg);
+  opacity: 0.26;
+}
+
+.decor span:nth-child(4) {
+  top: 56%;
+  right: 2.5%;
+  width: 5rem;
+  height: 5rem;
+  transform: rotate(-8deg);
+  opacity: 0.3;
+}
+
+.decor span:nth-child(5) {
+  bottom: 15%;
+  left: 5%;
+  width: 3.2rem;
+  height: 3.2rem;
+  transform: rotate(17deg);
+  opacity: 0.22;
+}
+
+.decor span:nth-child(6) {
+  bottom: 7%;
+  right: 9%;
+  width: 2.8rem;
+  height: 2.8rem;
+  transform: rotate(-19deg);
+  opacity: 0.28;
+}
+
+/* Once the layout narrows, the marks would sit under the text rather than beside
+   it, so keep only the ones in the outer corners. */
+@media (max-width: 52rem) {
+  .decor span:nth-child(2),
+  .decor span:nth-child(3),
+  .decor span:nth-child(5) {
+    display: none;
+  }
+}
+
+/* Lift the real content above the decoration layer. */
+header,
+main {
+  position: relative;
+  z-index: 1;
 }
 
 /* ----------------------------------------------------------------- header */
@@ -72,10 +177,11 @@ header a:hover {
 header .brand {
   grid-column: 2;
   justify-self: center;
+  font-family: Georgia, "Times New Roman", serif;
   font-weight: 700;
   font-size: 2.1rem;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 nav {
@@ -117,6 +223,18 @@ nav button.nav-link:hover {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* The avatar doubles as the way into the account settings. */
+.account-link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+}
+
+.account-link:hover {
+  transform: translateY(-2px);
 }
 
 /* Centred stack when there is not enough room for three columns. */
@@ -361,6 +479,13 @@ textarea {
    that the page itself is wider to fit the notes grid. */
 main > form:not(.search) {
   max-width: 34rem;
+}
+
+/* The account page carries two forms, so each needs its own heading. */
+.account-heading {
+  max-width: 34rem;
+  margin: 2rem 0 0.5rem;
+  font-size: 1.15rem;
 }
 
 label {
