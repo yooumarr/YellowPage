@@ -1,0 +1,39 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- Downloaded model weights for semantic search ---
+.cache/
+
+# --- Local database (contains real accounts and notes) ---
+notes.db
+notes.db-journal
+notes.db-wal
+notes.db-shm
+
+# --- Secrets ---
+.env
+.env.*
+
+# --- Editors / OS ---
+# Uncomment if you would rather not share editor settings.
+# .vscode/
+# .idea/
+.DS_Store
+Thumbs.db
+
+# --- Test / tooling caches ---
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/

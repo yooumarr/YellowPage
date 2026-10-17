@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% set editing = note is not none %}
+{% block title %}{{ "Edit note" if editing else "New note" }}{% endblock %}
+
+{% block content %}
+  <h1>{{ "Edit note" if editing else "New note" }}</h1>
+
+  <form method="post"
+        action="{{ url_for('edit_note', note_id=note.id) if editing else url_for('new_note') }}">
+    <label for="title">Title</label>
+    <input id="title" name="title" required autofocus
+           value="{{ note.title if editing else '' }}">
+
+    <label for="content">Content</label>
+    <textarea id="content" name="content">{{ note.content if editing else '' }}</textarea>
+
+    <div class="actions">
+      <button type="submit">{{ "Save changes" if editing else "Create note" }}</button>
+      <a class="button"
+         href="{{ url_for('note_detail', note_id=note.id) if editing else url_for('index') }}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

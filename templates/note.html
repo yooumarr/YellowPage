@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}{{ note.title }}{% endblock %}
+
+{% block content %}
+  <article class="note">
+    <h1>{{ note.title }}</h1>
+    <p class="meta">
+      {{ avatar(note.owner, decorative=true) }} by {{ note.owner }} &middot; created {{ note.created_at|date }}
+    </p>
+    <div class="content">{{ note.content }}</div>
+  </article>
+
+  <div class="actions">
+    <a class="button" href="{{ url_for('index') }}">Back to all notes</a>
+
+    {% if g.user and g.user.id == note.owner_id %}
+      <a class="button" href="{{ url_for('edit_note_form', note_id=note.id) }}">Edit</a>
+      <form method="post" action="{{ url_for('delete_note', note_id=note.id) }}"
+            onsubmit="return confirm('Delete this note for good?');">
+        <button type="submit" class="danger">Delete</button>
+      </form>
+    {% elif g.user %}
+      <span class="meta">This note belongs to {{ note.owner }} — you can read it but not change it.</span>
+    {% endif %}
+  </div>
+{% endblock %}

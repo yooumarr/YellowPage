@@ -1,0 +1,5 @@
+{# A round badge holding the first letter of a name. Pass decorative=true when the
+   name is written out beside it, so screen readers do not read it twice. #}
+{% macro avatar(name, decorative=false) -%}
+<span class="avatar"{% if decorative %} aria-hidden="true"{% else %} role="img" title="{{ name }}" aria-label="{{ name }}"{% endif %}>{{ (name or "?")[:1]|upper }}</span>
+{%- endmacro %}

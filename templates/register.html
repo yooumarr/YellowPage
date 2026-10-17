@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+  <h1>Create an account</h1>
+
+  <form method="post" action="{{ url_for('register') }}">
+    <label for="username">Username</label>
+    <input id="username" name="username" required autofocus autocomplete="username">
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required autocomplete="new-password"
+           minlength="4">
+
+    <div class="actions">
+      <button type="submit">Register</button>
+      <a href="{{ url_for('login_form') }}">I already have an account</a>
+    </div>
+  </form>
+{% endblock %}

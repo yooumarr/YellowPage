@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}Search{% endblock %}
+
+{% block content %}
+  <h1>Search notes</h1>
+  {% include "_search_form.html" %}
+
+  {% if query %}
+    <p class="meta">
+      {{ results|length }} match{{ "" if results|length == 1 else "es" }}
+      for &ldquo;{{ query }}&rdquo;, closest meaning first.
+    </p>
+
+    {% if results %}
+      {% set result_count = results|length %}
+      {% set placeholders = (3 - result_count % 3) % 3 %}
+
+      <div class="notes-grid">
+        {% for note in results %}
+          <article class="note">
+            <h2>
+              <a href="{{ url_for('note_detail', note_id=note.id) }}">{{ note.title }}</a>
+              <span class="pill" title="cosine similarity, higher is closer">{{ "%.2f"|format(note.score) }}</span>
+            </h2>
+            <p class="meta">{{ avatar(note.owner, decorative=true) }} by {{ note.owner }} &middot; created {{ note.created_at|date }}</p>
+            <p>{{ note.content[:160] }}{% if note.content|length > 160 %}&hellip;{% endif %}</p>
+            {% if g.user and g.user.id == note.owner_id %}
+              <div class="note-actions">
+                <a class="button small" href="{{ url_for('edit_note_form', note_id=note.id) }}">Edit</a>
+              </div>
+            {% endif %}
+          </article>
+        {% endfor %}
+
+        {# The empty tail keeps the grid's shape and offers the way in. #}
+        {% for _ in range(placeholders) %}
+          {% if loop.first %}
+            <article class="note add-note">
+              <a class="button" href="{{ url_for('new_note_form') }}">New note</a>
+            </article>
+          {% else %}
+            <article class="note placeholder" aria-hidden="true"></article>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Nothing matched. Try different wording, or
+        <a href="{{ url_for('index') }}">browse all notes</a>.</p>
+    {% endif %}
+  {% else %}
+    <p class="meta">
+      Search matches on meaning, not exact words — so you can ask for a topic and
+      find a note that never uses your phrasing.
+    </p>
+  {% endif %}
+{% endblock %}

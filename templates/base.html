@@ -1,0 +1,57 @@
+<!doctype html>{% from "_avatar.html" import avatar %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}YellowPage{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <a class="brand" href="{{ url_for('index') }}">YellowPage</a>
+    <nav>
+      <a class="nav-link" href="{{ url_for('search_page') }}">Search</a>
+      {% if g.user %}
+        <a class="nav-link" href="{{ url_for('new_note_form') }}">New note</a>
+        <div class="account">
+          <form method="post" action="{{ url_for('logout') }}">
+            <button type="submit" class="nav-link">Log out</button>
+          </form>
+          {{ avatar(g.user.username) }}
+        </div>
+      {% else %}
+        <a class="nav-link" href="{{ url_for('login_form') }}">Log in</a>
+        <a class="nav-link" href="{{ url_for('register_form') }}">Register</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for category, message in messages %}
+            <p class="flash {{ category }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    // Flash messages are confirmations rather than a permanent record, so they
+    // fade out shortly after the page loads.
+    document.querySelectorAll(".flash").forEach(function (el) {
+      setTimeout(function () {
+        el.classList.add("dismissed");
+        var remove = function () { el.remove(); };
+        el.addEventListener("transitionend", remove, { once: true });
+        // Fallback for when no transition runs (e.g. reduced motion).
+        setTimeout(remove, 500);
+      }, 3000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}All notes{% endblock %}
+
+{% block content %}
+  <p class="tagline">a simple way to note your thoughts, and read other's.</p>
+
+  {% include "_search_form.html" %}
+
+  {% if not notes %}
+    <p>No notes yet.
+      {% if g.user %}Start the first one below.
+      {% else %}Log in to start the first one.{% endif %}
+    </p>
+  {% endif %}
+
+  {% set note_count = notes|length %}
+  {% set empty_cells = (3 - note_count % 3) % 3 %}
+  {# An empty notebook still gets a full row, so the way in stays visible. #}
+  {% if not note_count %}{% set empty_cells = 3 %}{% endif %}
+
+  <div class="notes-grid">
+    {% for note in notes %}
+      <article class="note">
+        <h2><a href="{{ url_for('note_detail', note_id=note.id) }}">{{ note.title }}</a></h2>
+        <p class="meta">
+          {{ avatar(note.owner, decorative=true) }} by {{ note.owner }} &middot; created {{ note.created_at|date }}
+          {% if g.user and g.user.id == note.owner_id %}
+            &middot;
+            <span class="owner-icon" title="This is your note" aria-label="This is your note">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4Z"/>
+                <path d="M12 14c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4Z"/>
+              </svg>
+            </span>
+          {% endif %}
+        </p>
+        <p>{{ note.content[:160] }}{% if note.content|length > 160 %}&hellip;{% endif %}</p>
+
+        {% if g.user and g.user.id == note.owner_id %}
+          <div class="note-actions">
+            <a class="button small" href="{{ url_for('edit_note_form', note_id=note.id) }}">Edit</a>
+          </div>
+        {% endif %}
+      </article>
+    {% endfor %}
+
+    {# The empty tail keeps the grid's shape and offers the way in. #}
+    {% for _ in range(empty_cells) %}
+      {% if loop.first %}
+        <article class="note add-note">
+          <a class="button" href="{{ url_for('new_note_form') }}">New note</a>
+        </article>
+      {% else %}
+        <article class="note placeholder" aria-hidden="true"></article>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}
