@@ -1,9 +1,7 @@
 # YellowPage
 
-A small toy project for learning how MCP works, built around a notes app.
-
-The name comes from the *Yellow Pages*: a public directory you search by what you
-are after, rather than by who you already know. Notes here work the same way —
+A project for learning how MCP works, built around a notes app.
+Notes here work in the following way —
 everyone's are listed for everyone, and you find them by meaning rather than by
 exact wording.
 
@@ -22,20 +20,6 @@ Notes can also be found **by meaning** rather than by keyword — a query like
 "what did I learn about GPU memory?" turns up a note called "CUDA VRAM basics".
 See [Semantic search](#semantic-search).
 
-## Access rules
-
-| Action | Who can do it |
-| --- | --- |
-| Register an account | Anyone |
-| Log in / log out | Anyone with valid credentials |
-| Read any note (list, detail) | Anyone, logged in or not |
-| Search notes | Anyone, logged in or not |
-| Create a note | Any logged-in user (recorded as the owner) |
-| Edit / delete a note | **Only its owner** |
-
-Every note has an `owner_id`, so ownership is enforced in `notes.py` and surfaced
-in the UI (the Flask app returns `403` and hides the buttons when a note isn't
-yours).
 
 ## Project layout
 
@@ -151,52 +135,3 @@ belong to a different model first, so two vector spaces never mix.
 The model weights are downloaded once, on first use, into `.cache/fastembed/`
 inside the project. That directory is git-ignored and safe to delete; the next
 search will re-fetch it. Set `NOTES_EMBED_MODEL` to try a different model.
-
-## Database
-
-`notes.db` is created automatically on first run. Three tables:
-
-```sql
-users (id, username UNIQUE, password_hash, created_at)
-
-notes (id, owner_id -> users(id), title, content, created_at, updated_at)
-
-note_embeddings (note_id -> notes(id), model, dim, vector BLOB, updated_at)
-```
-
-Passwords are never stored in plain text; `auth.py` keeps a salted hash produced
-by `werkzeug.security`. Deleting a user cascades to their notes, and deleting a
-note takes its embedding row with it (`ON DELETE CASCADE`).
-
-To start over, just delete the file:
-
-```powershell
-Remove-Item notes.db
-```
-
-To peek at it without a SQLite client installed, use the standard library:
-
-```powershell
-.venv\Scripts\python.exe -c "import sqlite3; c=sqlite3.connect('notes.db'); print(c.execute('SELECT * FROM notes').fetchall())"
-```
-
-## Known limitations
-
-This is a teaching project, not production software:
-
-- **No CSRF protection.** Add Flask-WTF (or equivalent) before exposing it.
-- **Default secret key.** `app.secret_key` falls back to `"dev-secret-change-me"`.
-  Set the `NOTES_SECRET_KEY` environment variable instead.
-- **`debug=True`** is hard-coded in `app.run()` for local development.
-- **No rate limiting** on login attempts.
-- The MCP server is read-only on purpose, so it cannot satisfy "only the owner
-  may edit" — there is no user context on that path.
-- **Search ranks with a brute-force numpy pass** over every vector, which is
-  instant here but would want a real vector index at a much larger scale.
-- **The first search downloads ~130 MB** of model weights. After that it is
-  offline.
-- **Embeddings belong to a model.** Change `NOTES_EMBED_MODEL` and you must run
-  `search.py reindex`; query and document vectors from different models are not
-  comparable.
-- **Semantic search only.** There is no keyword/hybrid blending or reranking step
-  yet, so an exact phrase can occasionally lose to a semantically close note.
